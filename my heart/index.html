@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Love & Memories</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #ff3366;
+            --secondary-color: #6c5ce7;
+            --dark-bg: #0a0a1f;
+            --card-bg: rgba(255, 255, 255, 0.1);
+        }
+
+        body {
+            margin: 0;
+            background: radial-gradient(circle at top right, var(--secondary-color), var(--dark-bg));
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+            overflow-x: hidden;
+        }
+        
+
+        .noise-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('data:image/svg+xml,<svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"><filter id="n"><feTurbulence type="fractalNoise" baseFrequency="0.5"/></filter><rect width="100%" height="100%" filter="url(%23n)" opacity="0.05"/></svg>');
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .main-container {
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Hero Section */
+        .hero {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-content {
+            text-align: center;
+            z-index: 3;
+        }
+
+        .hero-heart {
+            font-size: 120px;
+            cursor: pointer;
+            position: relative;
+            display: inline-block;
+        }
+
+        .hero-heart::after {
+            content: '❤️';
+            position: absolute;
+            top: 0;
+            left: 0;
+            opacity: 0;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.5; }
+            50% { transform: scale(1.2); opacity: 0; }
+            100% { transform: scale(1); opacity: 0.5; }
+        }
+
+        /* Gallery Section */
+        .gallery {
+            padding: 100px 0;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .gallery-item {
+            position: relative;
+            border-radius: 20px;
+            overflow: hidden;
+            transform-style: preserve-3d;
+            transform: perspective(1000px);
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .gallery-item:hover {
+            transform: perspective(1000px) rotateY(10deg) scale(1.05);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 400px;
+            object-fit: cover;
+            transition: transform 0.6s;
+        }
+
+        .gallery-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 20px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.4s;
+        }
+
+        .gallery-item:hover .gallery-overlay {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        /* Music Player */
+        .music-player {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            padding: 15px 30px;
+            border-radius: 50px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+
+        .music-player:hover {
+            transform: translateX(-50%) translateY(-5px);
+        }
+
+        .player-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .play-btn {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: none;
+            background: var(--primary-color);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .play-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 20px var(--primary-color);
+        }
+
+        /* Animations */
+        .floating-emoji {
+            position: fixed;
+            font-size: 24px;
+            pointer-events: none;
+            animation: float 3s ease-in forwards;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) scale(0.5) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) scale(1.5) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        /* Modal Styles */
+        .modal-custom {
+            background: rgba(10, 10, 31, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 30px;
+            overflow: hidden;
+        }
+
+        .modal-custom .modal-content {
+            background: none;
+            border: none;
+        }
+
+        .modal-custom img {
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-color);
+            border-radius: 5px;
+        }
+
+        /* Memory Cards */
+        .memory-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            margin: 20px 0;
+            transform: translateY(50px);
+            opacity: 0;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .memory-card.visible {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .memory-card h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="noise-bg"></div>
+    
+    <div class="main-container">
+        <section class="hero">
+            <div class="hero-content">
+                <div class="hero-heart">❤️</div>
+                <h1 class="mt-4 display-4 fw-bold animate__animated animate__fadeIn">Forever in My Heart</h1>
+                <p class="lead mt-3 animate__animated animate__fadeIn animate__delay-1s">Every moment with you is a treasure</p>
+            </div>
+        </section>
+
+        <section class="gallery">
+            <div class="container">
+                <h2 class="text-center mb-5 display-5">Our Beautiful Memories</h2>
+                <div class="gallery-grid">
+                    <div class="gallery-item">
+                        <img src="assets/IMG-20230524-WA00031.jpg" style="object-fit: cover;object-position:1000 20"  alt="First Date">
+                        <div class="gallery-overlay">
+                            <h3>Our First Date</h3>
+                            <p>That magical evening when everything began...</p>
+                        </div>
+                    </div>
+                    <!-- Add more gallery items here -->
+                </div>
+       
+                <div class="gallery-grid">
+                    <div class="gallery-item">
+                        <img src="assets/IMG_20230914_183051105.jpg" style="object-fit: cover;object-position:1000 20"  alt="First Date">
+                        <div class="gallery-overlay">
+                            <h3>Our First cafe</h3>
+                            <p>That magical evening when everything began...</p>
+                        </div>
+                    </div>
+                    <!-- Add more gallery items here -->
+                </div>
+         
+        
+                <div class="gallery-grid">
+                    <div class="gallery-item">
+                        <img src="assets/20231010_200805.jpg"style="object-fit: cover;object-position:1000 20"  alt="First Date">
+                        <div class="gallery-overlay">
+                            <h3>Our First Date</h3>
+                            <p>That magical evening when everything began...</p>
+                        </div>
+                   
+                    <!-- Add more gallery items here -->
+            </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section class="memories py-5">
+            <div class="container">
+                <div class="memory-card">
+                    <h3>The Day We Met</h3>
+                    <p>Life has a beautiful way of bringing people together at just the right moment...</p>
+                </div>
+                <!-- Add more memory cards -->
+            </div>
+        </section>
+        <section class="memories py-5">
+            <div class="container">
+                <div class="memory-card">
+                    <h3>The Day We GO</h3>
+                    <p>Not able to say</p>
+                </div>
+                <!-- Add more memory cards -->
+            </div>
+        </section>
+    </div>
+
+    <div class="music-player">
+        <div class="player-controls">
+            <select class="form-select" style="width: 200px;">
+                <option>💝 Our First Dance</option>
+                <option>💖 When I Think of You</option>
+                <option>❤️ Forever Together</option>
+            </select>
+            <button class="play-btn">▶️</button>
+        </div>
+    </div>
+
+    <script>
+        // Intersection Observer for memory cards
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.memory-card').forEach(card => {
+            observer.observe(card);
+        });
+
+        // Floating emojis
+        const emojis = ['❤️', '💖', '💝', '💕', '🌹', '✨', '💫'];
+        
+        function createFloatingEmoji() {
+            const emoji = document.createElement('div');
+            emoji.className = 'floating-emoji';
+            emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+            emoji.style.left = Math.random() * 100 + 'vw';
+            emoji.style.animationDuration = (Math.random() * 2 + 2) + 's';
+            document.body.appendChild(emoji);
+            
+            setTimeout(() => emoji.remove(), 3000);
+        }
+
+        setInterval(createFloatingEmoji, 300);
+
+        // Heart click effect
+        document.querySelector('.hero-heart').addEventListener('click', () => {
+            for (let i = 0; i < 10; i++) {
+                setTimeout(createFloatingEmoji, i * 100);
+            }
+        });
+
+        // Music player functionality
+        let audio = null;
+        const playBtn = document.querySelector('.play-btn');
+        
+        playBtn.addEventListener('click', () => {
+            if (!audio) {
+                audio = new Audio('kk.mp3');
+                audio.loop = true;
+            }
+            
+            if (audio.paused) {
+                audio.play();
+                playBtn.textContent = '⏸️';
+            } else {
+                audio.pause();
+                playBtn.textContent = '▶️';
+            }
+        });
+
+        // Add parallax effect
+        document.addEventListener('mousemove', (e) => {
+            const cards = document.querySelectorAll('.gallery-item');
+            const xAxis = (window.innerWidth / 2 - e.pageX) / 50;
+            const yAxis = (window.innerHeight / 2 - e.pageY) / 50;
+            
+            cards.forEach(card => {
+                card.style.transform = `perspective(1000px) rotateY(${xAxis}deg) rotateX(${yAxis}deg) scale(1.05)`;
+            });
+        });
+    </script>
+</body>
+</html>
