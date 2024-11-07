@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Heart & Memories</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1a1a2e, #16213e);
+            color: #ffe7e7;
+            min-height: 100vh;
+            font-family: 'Arial', sans-serif;
+           /* overflow-x: hidden;*/
+        }
+
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        .heart {
+            color: #ff6b8b;
+            font-size: 4rem;
+            animation: heartbeat 1.5s ease-in-out infinite;
+        }
+
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .music-control {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            transition: all 0.3s ease;
+        }
+
+        .music-control:hover {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .progress {
+            height: 4px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .progress-bar {
+            background: #ff6b8b;
+        }
+
+        .song-select {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            border-radius: 10px;
+            padding: 10px;
+        }
+
+        .song-select option {
+            background: #1a1a2e;
+        }
+
+        /* Gallery Styles */
+        .gallery-container {
+            margin-top: 2rem;
+        }
+
+        .memory-card {
+            position: relative;
+            overflow: hidden;
+            border-radius: 15px;
+            cursor: pointer;
+            height: 200px;
+            background: rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .memory-card:hover {
+            transform: translateY(-5px) scale(1.02);
+        }
+
+        .memory-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0;
+            transition: opacity 0.5s ease;
+        }
+
+        .memory-card:hover img {
+            opacity: 1;
+        }
+
+        .memory-overlay {
+            position: absolute;
+            bottom: -100%;
+            left: 0;
+            right: 0;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .memory-card:hover .memory-overlay {
+            bottom: 0;
+        }
+
+        .memory-date {
+            font-size: 0.8rem;
+            opacity: 0.8;
+        }
+
+        .gallery-title {
+            position: relative;
+            display: inline-block;
+            margin-bottom: 2rem;
+        }
+
+        .gallery-title::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff6b8b, transparent);
+        }
+
+        .modal-content {
+            background: rgba(26, 26, 46, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-header, .modal-footer {
+            border-color: rgba(255, 255, 255, 0.1);
+        }
+          /* Floating Emoji Styles */
+          .floating-emoji {
+            position: fixed;
+            font-size: 1.5rem;
+            pointer-events: none;
+            z-index: 1000;
+            animation: float-emoji var(--duration) linear infinite;
+            opacity: 0.6;
+            transform-origin: center;
+        }
+
+        @keyframes float-emoji {
+            0% {
+                transform: translate(var(--start-x), 110vh) rotate(0deg);
+            }
+            100% {
+                transform: translate(var(--end-x), -10vh) rotate(360deg);
+            }
+        }
+
+        /* Rest of your previous styles... */
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: none;
+            border-radius: 15px;
+            transition: transform 0.3s ease;
+            position: relative;
+            z-index: 1;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+    </style>
+</head>
+<body>
+    <div id="emoji-container"></div>
+    <div class="container py-5">
+        <div class="row justify-content-center">
+            <div class="col-md-8 text-center">
+                <!-- Main Heart -->
+                <div class="mb-4">
+                    <div class="heart">💖</div>
+                    <h1 class="display-5 mt-3">My Heart</h1>
+                </div>
+
+                <!-- Music Player -->
+                <div class="card mb-4 p-4">
+                    <h3 class="h5 mb-4">Music Player</h3>
+                    
+                    <!-- Audio Player -->
+                    <audio id="audioPlayer" src="kj.mp3" controls style="display: none;"></audio>
+                    <select class="song-select mb-4 w-100" onchange="changeSong(this.value)">
+                        <option value="kj.mp3">Kaun Tujhe</option>
+                        <option value="afhuri.mp3">Adhuri Khanai</option>
+                        <option value="kk.mp3">Khamosiya</option>
+                    </select>
+                    
+                    <div class="progress mb-3">
+                        <div class="progress-bar" role="progressbar" style="width: 0"></div>
+                    </div>
+
+                    <div class="d-flex justify-content-between align-items-center">
+                        <button class="music-control" data-bs-toggle="tooltip" title="Previous">⏮️</button>
+                        <button class="music-control" onclick="togglePlay()" data-bs-toggle="tooltip" title="Play/Pause">▶️</button>
+                        <button class="music-control" data-bs-toggle="tooltip" title="Next">⏭️</button>
+                    </div>
+                </div>
+
+                <!-- Gallery Section -->
+                <div class="gallery-container">
+                    <h2 class="gallery-title">Our Memories</h2>
+                    <div class="row g-4">
+                        <!-- Memory 1 -->
+                        <div class="col-md-6">
+                            <div class="memory-card">
+                                <img src="assets/IMG-20230524-WA00031.jpg" style="object-fit: contain;object-position:1000 20"  alt="First Pic">
+                                <div class="memory-overlay">
+                                    <h5 class="mb-1">Our First pic</h5>
+                                    <!-- <div class="memory-date">June 15, 2023</div> -->
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Memory 2 -->
+                        <div class="col-md-6">
+                            <div class="memory-card">
+                                <img src="assets/IMG_20221112_135416.jpg" style="object-fit: contain;object-position:1000 20" alt="Beach Day">
+                                <div class="memory-overlay">
+                                    <h5 class="mb-1">At Temple</h5>
+                                    <!-- <div class="memory-date">July 23, 2023</div> -->
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Memory 3 -->
+                        <div class="col-md-6">
+                            <div class="memory-card">
+                                <img src="assets/IMG-20230126-WA0004.jpg" style="object-fit: contain;object-position:1000 20"  alt="Movie Night">
+                                <div class="memory-overlay">
+                                    <h5 class="mb-1">Swaraswati Puja</h5>
+                                    <div class="memory-date">Jan 26, 2023</div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Memory 4 -->
+                        <div class="col-md-6">
+                            <div class="memory-card">
+                                <img src="assets/20231010_200805.jpg" style="object-fit: contain;object-position:1000 20"  alt="Coffee Date">
+                                <div class="memory-overlay">
+                                    <!-- <h5 class="mb-1">Favorite Café</h5>
+                                    <div class="memory-date">September 12, 2023</div> -->
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Memory 4 -->
+                        <div class="col-md-6">
+                            <div class="memory-card">
+                                <img src="assets/IMG_20230914_183051105.jpg" style="object-fit: contain;object-position:1000 20"  alt="Coffee Date">
+                                <div class="memory-overlay">
+                                    <h5 class="mb-1">Favorite Café</h5>
+                                    <!-- <div class="memory-date">September 12, 2023</div> -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quote -->
+                <div class="card p-4 mt-4">
+                    <p class="mb-0" style="font-style: italic;color:rgba(235, 128, 226, 0.985)">
+                        "Every memory with you is a treasure I hold dear to my heart."
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+          // Emoji floating animation
+          const emojis = ['♥️', '💕', '💗', '💓', '💖', '✨', '🌟', '💝', '💘', '💌'];
+          const emojiContainer = document.getElementById('emoji-container');
+  
+          function createFloatingEmoji() {
+              const emoji = document.createElement('div');
+              emoji.className = 'floating-emoji';
+              emoji.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+              
+              // Random starting and ending positions
+              const startX = Math.random() * window.innerWidth;
+              const endX = startX + (Math.random() * 200 - 100); // Random drift
+              const duration = 7 + Math.random() * 7; // Random duration between 7-14s
+              
+              emoji.style.setProperty('--start-x', `${startX}px`);
+              emoji.style.setProperty('--end-x', `${endX}px`);
+              emoji.style.setProperty('--duration', `${duration}s`);
+              emoji.style.left = '0';
+              
+              emojiContainer.appendChild(emoji);
+              
+              // Remove emoji after animation completes
+              setTimeout(() => {
+                  emoji.remove();
+              }, duration * 1000);
+          }
+  
+          // Create new emoji every 1 second
+          setInterval(createFloatingEmoji, 1000);
+  
+          // Create initial batch of emojis
+          for(let i = 0; i < 10; i++) {
+              createFloatingEmoji();
+          }
+        const audioPlayer = document.getElementById('audioPlayer');
+        const progressBar = document.querySelector('.progress-bar');
+
+        function changeSong(song) {
+            audioPlayer.src = song;
+            audioPlayer.play();
+        }
+
+        audioPlayer.addEventListener('timeupdate', () => {
+            const progress = (audioPlayer.currentTime / audioPlayer.duration) * 100;
+            progressBar.style.width = progress + '%';
+        });
+
+        function togglePlay() {
+            if (audioPlayer.paused) {
+                audioPlayer.play();
+            } else {
+                audioPlayer.pause();
+            }
+        }
+
+        document.querySelectorAll('.music-control').forEach(button => {
+            button.addEventListener('click', function() {
+                this.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    this.style.transform = 'scale(1)';
+                }, 100);
+            });
+        });
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
